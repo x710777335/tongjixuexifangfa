@@ -1,0 +1,39 @@
+import pandas as pd
+from fractions import Fraction
+
+data_dict={'x1':[1,1,1,1,1,2,2,2,2,2,3,3,3,3,3],
+           'x2':['S','M','M','S','S','S','M','M','L','L','L','M','M','L','L'],
+             'y':[-1,-1,1,1,-1,-1,-1,1,1,1,1,1,1,1,-1]}
+data=pd.DataFrame(data_dict)
+
+def pqian(data,x,y):
+    column=data.columns
+    column=column[0:len(column)-1]
+    data_y=data[data['y'].isin([y])]
+    p=1
+    xi=0
+    for word in column:
+        x_set=x[xi]
+        xi+=1
+        data_y_x=data_y[data_y[word].isin([x_set])]
+        p=p*Fraction(len(data_y_x),len(data_y))
+    return p
+
+def pfen(data,y):
+    return Fraction(len(data[data['y'].isin([y])]), len(data))
+
+def pzong(data,x):
+    y_data = data['y'].unique()
+    P = []
+    for i in y_data:
+        p1 = pfen(data, i) * pqian(data, x, i)  # 分别计算x被分到所有类别的概率
+        P.append(p1)
+        print('y取%d时的概率为%s' % (i, P[i]))
+    p_max = max(P)
+    dx = P.index(p_max)
+    print('概率最大值是：%s,对应的y值为%d' % (p_max, y_data[dx]))
+
+x=(2,'S')
+print('输入的是',x)
+print('答案是:')
+pzong(data,x)
