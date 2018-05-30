@@ -1,0 +1,44 @@
+import math
+import copy
+from scipy import stats
+import numpy as np
+observations = np.array([[1, 0, 0, 0, 1, 1, 0, 1, 0, 1],
+                         [1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+                         [1, 0, 1, 1, 1, 1, 1, 0, 1, 1],
+                         [1, 0, 1, 0, 0, 0, 1, 1, 0, 0],
+                         [0, 1, 1, 1, 0, 1, 1, 1, 0, 1]])
+
+def em_single(priors,observations):
+    counts={'A':{'H':0,'T':0},'B':{'H':0,'T':0}}
+    theta_a=priors[0]
+    theta_b = priors[1]
+    for observation in observations:
+        len_observation=len(observation)
+        num_heads=observation.sum()
+        num_tails= len_observation-num_heads
+        contribution_a=stats.binom.pmf(num_heads,len_observation,theta_a)
+        contribution_b = stats.binom.pmf(num_heads, len_observation, theta_b)
+        weight_a=contribution_a/(contribution_a+contribution_b)
+        weight_b=contribution_b/(contribution_a+contribution_b)
+        counts['A']['H']+=weight_a*num_heads
+        counts['A']['T']+=weight_a*num_tails
+        counts['B']['H']+=weight_b*num_heads
+        counts['B']['T']+=weight_b*num_tails
+    new_theta_a=counts['A']['H']/(counts['A']['H']+counts['A']['T'])
+    new_theta_b = counts['B']['H'] / (counts['B']['H'] + counts['B']['T'])
+    return (new_theta_a,new_theta_b)
+
+def em(observations,prior,tol=1e-6,iterations=10000):
+    import math
+    iteration=0
+    while iteration<iterations:
+        new_prior=em_single(prior,observations)
+        delta_change=np.abs(prior[0]-new_prior[0])
+        if delta_change<tol:
+            break
+        else:
+            prior=new_prior
+            iteration+=1
+    return [new_prior,iteration]
+
+print(em(observations,[0.6,0.5]))
