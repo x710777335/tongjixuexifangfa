@@ -1,0 +1,32 @@
+import numpy as np
+X=[[3,3],[4,3],[1,1]]
+Y=[1,1,-1]
+x=np.array(X)
+y=np.array(Y)
+s1=[0,1,2]
+s2=[0,1,2]
+G=np.zeros([3,3])
+q=np.ones(3)
+a = np.zeros(3,np.float)
+b = 0.0
+#print(a)
+for i in range(3):
+    for j in range(3):
+      G[i][j]=np.dot(x[i],x[j])
+def huoqu(a,b,i):
+        z = np.dot(a*y, G[i]) + b
+        return z
+def ganzhiqi(x, y, time=3):
+    while True:
+        count=0
+        for i in range(time):
+           global a,b
+           z=huoqu(a,b,i)
+           if y[i]*z<=0:
+               a[i]+= 1
+               b = b + y[i]
+               count+=1
+        if count == 0:
+            print(a,b)
+            return(a,b)
+ganzhiqi(x,y)
